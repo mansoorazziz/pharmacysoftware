@@ -15,8 +15,8 @@ cur = conn.cursor()
 
 # Function to handle signup
 def signup():
-    username = entry_username.get()
-    password = entry_password.get()
+    username = emailEntry.get()
+    password = passwordEntry.get()
 
     if username and password:
         try:
@@ -32,8 +32,8 @@ def signup():
 
 # Function to handle login
 def login():
-    username = entry_username.get()
-    password = entry_password.get()
+    username = emailEntry.get()
+    password = passwordEntry.get()
 
     cur.execute("SELECT * FROM users WHERE username = %s AND password = %s", (username, password))
     user = cur.fetchone()
