@@ -9,7 +9,7 @@
 
 
 import tkinter as tk
-from tkinter import messagebox, ttk
+from tkinter import messagebox, ttk, simpledialog
 import tempfile, os, smtplib, subprocess, time, sqlite3
 
 #Fuctionality part\
@@ -367,7 +367,7 @@ def update_listbox(event):
 # Function to search and update Listbox
 def fetch_data(search_term):
 
-    cursor.execute("SELECT name FROM medicine WHERE name LIKE ?", ('%' + search_term + '%',))
+    cursor.execute("SELECT medicine_name FROM inventory WHERE medicine_name LIKE ?", ('%' + search_term + '%',))
 
     results = cursor.fetchall()
     return results
@@ -458,10 +458,11 @@ def clearAll():
     textArea.delete(1.0, tk.END)
 
     textArea.insert(1.0, '\t   ***Medical Store***\n\n')
-    textArea.insert(tk.END, '\tContact Number:0311-5552866\n\tEmail:mansoorpay@gmail.com\n')
-    textArea.insert(tk.END, '========================================\n')
-    textArea.insert(tk.END, '  Item\t\tQuantity\t\tPrice\n')
-    textArea.insert(tk.END, '========================================\n')
+    textArea.insert(tk.END,'\tContact # :0311-5552866\n\tEmail:mansoorpay@gmail.com\n')
+    textArea.insert(tk.END,'========================================\n')
+    textArea.insert(tk.END,' Item \t     Unit \t  Quantity\t   Total \n')
+    textArea.insert(tk.END,' Name \t     Price \t\t         Price \n')
+    textArea.insert(tk.END,'========================================\n')
 
 
 def total():
@@ -508,11 +509,18 @@ def on_select(event):
 
     if selectedIndex:
         item = projectsList.get(selectedIndex)
-        query = "SELECT price FROM medicine WHERE name = ?"
+        query = "SELECT price FROM inventory WHERE medicine_name = ?"
         cursor.execute(query, (item,))
-        priceOfitem = cursor.fetchone()[0]
-        totalPrice = totalPrice + int(priceOfitem)
-        textArea.insert(tk.END, f'  {item}\t\t1\t\t{priceOfitem}\n')
+
+        priceofitem = cursor.fetchone()[0]
+        itemQuantity = simpledialog.askstring("Input", "Enter Quantity:", initialvalue="1")
+        if itemQuantity:
+        # Do something with the entered string 
+            # print("Entered string:", itemQuantity)
+            itemPrice = int(itemQuantity) * int(priceofitem)
+
+        totalPrice = totalPrice + int(itemPrice)
+        textArea.insert(tk.END, f' {item}\t\t{priceofitem}\t{itemQuantity}\t{itemPrice}\n')
         # print(f'Selected item is {item}')
     else:
         messagebox.INFO('Not Found','Unknown Error')
@@ -584,9 +592,10 @@ textArea = tk.Text(billFrame,height=25,width=40,yscrollcommand=scrollbar.set)
 textArea.pack()
 scrollbar.config(command=textArea.yview)
 textArea.insert(1.0,'\t   ***Medical Store***\n\n')
-textArea.insert(tk.END,'\tContact Number:0311-5552866\n\tEmail:mansoorpay@gmail.com\n')
+textArea.insert(tk.END,'\tContact # :0311-5552866\n\tEmail:mansoorpay@gmail.com\n')
 textArea.insert(tk.END,'========================================\n')
-textArea.insert(tk.END,'  Item\t\tQuantity\t\tPrice\n')
+textArea.insert(tk.END,' Item \t     Unit \t  Quantity\t   Total \n')
+textArea.insert(tk.END,' Name \t     Price \t\t         Price \n')
 textArea.insert(tk.END,'========================================\n')
 readitems()
 
