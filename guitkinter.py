@@ -14,6 +14,10 @@ import tempfile, os, smtplib, subprocess, time, sqlite3
 
 #Fuctionality part\
 
+def logout(): 
+    root.destroy() 
+    subprocess.run(["python", "registration.py"])
+
 def connectandcreatetable():
 # Connect to SQLite database
     conn = sqlite3.connect('medicspharmacy.db')
@@ -38,7 +42,7 @@ connectandcreatetable()
 def open_inventory_window():
     inventory_window = tk.Toplevel()
     inventory_window.title("Inventory Management")
-    inventory_window.geometry("600x450")
+    inventory_window.geometry("600x500")
 
     headingLabel = tk.Label(inventory_window, text="Inventory Management", font=('times new roman', 30, 'bold'), background='gray20', foreground='gold', bd=12, relief=tk.GROOVE)
     headingLabel.pack(fill=tk.X, pady=5)
@@ -103,10 +107,10 @@ def open_inventory_window():
             tag = "low" if record[4] < 10 else ""
             tree.insert('', 'end', values=(record[0], record[1], record[2], record[3], record[4], record[5]), tags=(tag,))
 
-       
+    
     readintotreeview()
-     
-           
+    
+        
 
     # sample_data = [
     #     (1, "Paracetamol", "2025-12-01", "B12345", 50, 10.0),
@@ -524,14 +528,14 @@ def send_email():
         receiverFrame.grid(row=1, column=0, padx=40, pady=20)
 
         receiverLabel = tk.Label(receiverFrame, text="Email Address", font=('arial', 14, 'bold'), background='grey20',
-                              foreground='white')
+                            foreground='white')
         receiverLabel.grid(row=0, column=0, padx=10, pady=8)
         receiverEntry = tk.Entry(receiverFrame, font=('arial', 14, 'bold'), bd=2, width=23, relief=tk.RIDGE)
         receiverEntry.grid(row=0, column=1, padx=10, pady=8)
 
         #Message
         messageLabel = tk.Label(receiverFrame, text="Message", font=('arial', 14, 'bold'), background='grey20',
-                              foreground='white')
+                            foreground='white')
         messageLabel.grid(row=1, column=0, padx=10, pady=8)
 
         emailtextArea = tk.Text(receiverFrame, font=('arial', 14, 'bold'), bd = 2, relief=tk.SUNKEN,width=42,height=11)
@@ -606,7 +610,7 @@ def readitems():
 
     cursor.execute("SELECT medicine_name FROM inventory;")
     # tree.insert('', 'end', values=(new_id, medicine_name_entry.get(), expiry_entry.get(), batch_no_entry.get(), quantity_entry.get(), price_entry.get())) 
-           
+        
     records = cursor.fetchall()
 
     conn.close()
@@ -617,6 +621,7 @@ def readitems():
 
 
 def on_select(event):
+
     global totalPrice
     selectedIndex = projectsList.curselection()
 
@@ -745,22 +750,23 @@ billmenuframe = tk.LabelFrame(projectPanel,text="Buttons",font=('times new roman
 billmenuframe.grid(row=0,column=1,padx=20)
 
 totalbutton=tk.Button(billmenuframe,text="Total",font=('arial',16,'bold'),background="gray20",
-                   foreground='white',bd=5,width=8,pady=10,command=total)
+                foreground='white',bd=5,width=8,pady=10,command=total)
 totalbutton.grid(row=0,column=0,pady=5,padx=10)
 
-billbutton=tk.Button(billmenuframe,text="Bill",font=('arial',16,'bold'),background="gray20",foreground='white',bd=5,width=8,pady=10)
+billbutton=tk.Button(billmenuframe,text="Bill",font=('arial',16,'bold'),background="gray20",
+                        foreground='white',bd=5,width=8,pady=10, command=logout)
 billbutton.grid(row=1,column=0,pady=5,padx=10)
 
 emailbutton=tk.Button(billmenuframe,text="Email",font=('arial',16,'bold'),background="gray20",
-                   foreground='white',bd=5,width=8,pady=10,command=send_email)
+                foreground='white',bd=5,width=8,pady=10,command=send_email)
 emailbutton.grid(row=2,column=0,pady=5,padx=10)
 
 printbutton=tk.Button(billmenuframe,text="Print",font=('arial',16,'bold'),background="gray20",
-                   foreground='white',bd=5,width=8,pady=10,command=print_bill)
+                foreground='white',bd=5,width=8,pady=10,command=print_bill)
 printbutton.grid(row=3,column=0,pady=5,padx=10)
 
 clearbutton=tk.Button(billmenuframe,text="Clear",font=('arial',16,'bold'),background="gray20",
-                   foreground='white',bd=5,width=8,pady=10,command=clearAll)
+                foreground='white',bd=5,width=8,pady=10,command=clearAll)
 clearbutton.grid(row=4,column=0,pady=5,padx=10)
 
 # root.protocol("WM_DELETE_WINDOW", on_closing)

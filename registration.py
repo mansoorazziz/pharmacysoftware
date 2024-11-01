@@ -1,7 +1,6 @@
 from tkinter import messagebox
-import sqlite3
+import sqlite3,subprocess
 import tkinter as tk
-
 # Connect to SQLite database
 conn = sqlite3.connect('medicspharmacy.db')
 cursor = conn.cursor()
@@ -40,7 +39,9 @@ def login():
     user = cursor.fetchone()
 
     if user:
-        messagebox.showinfo("Success", "Login successful!")
+        root.destroy() 
+        subprocess.run(["python", "guitkinter.py"])
+        # messagebox.showinfo("Success", "Login successful!")
     else:
         messagebox.showerror("Error", "Invalid username or password.")
 
