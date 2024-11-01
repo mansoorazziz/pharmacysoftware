@@ -73,8 +73,13 @@ def open_inventory_window():
     hsb = ttk.Scrollbar(treeviewFrame, orient="horizontal", command=tree.xview)
     hsb.pack(side='bottom', fill='x')
     tree.configure(xscrollcommand=hsb.set)
-
     tree.pack(fill='both', expand=True)
+
+    # Configure Treeview Style 
+    style = ttk.Style() 
+    style.configure("Treeview", rowheight=25) 
+    style.configure("Treeview.Heading", font=('Calibri', 10,'bold')) 
+    style.map('Treeview', background=[('selected', 'blue')])
 
     def clear_treeview():
         for item in tree.get_children():
@@ -90,10 +95,15 @@ def open_inventory_window():
         conn.close()
 
         clear_treeview()
+
         # projectsList.delete(0, tk.END)
+        tree.tag_configure('low', background='red', foreground='white')
         for record in completeRow:
             # projectsList.insert(tk.END, f'{record[0]}')
-            tree.insert('', 'end', values=(record[0], record[1], record[2], record[3], record[4], record[5]))
+            tag = "low" if record[4] < 10 else ""
+            tree.insert('', 'end', values=(record[0], record[1], record[2], record[3], record[4], record[5]), tags=(tag,))
+
+       
     readintotreeview()
      
            
@@ -612,18 +622,37 @@ def on_select(event):
 
     if selectedIndex:
         item = projectsList.get(selectedIndex)
-        query = "SELECT price FROM inventory WHERE medicine_name = ?"
+        query = "SELECT price,quantity FROM inventory WHERE medicine_name = ?"
 
         conn = sqlite3.connect('medicspharmacy.db')
         cursor = conn.cursor()
         cursor.execute(query, (item,))
+        result = cursor.fetchone()
 
-        priceofitem = cursor.fetchone()[0]
+        if result is not None: 
+            priceofitem = result[0] 
+            quantityofitem = result[1] 
 
-        conn.close()
+        else: 
+            print("No matching record found.") # Handle the case where no record is found
+
+        # priceofitem = cursor.fetchone()[0]
+        # quantityofitem = cursor.fetchone()[1]
+
 
         itemQuantity = simpledialog.askstring("Input", "Enter Quantity:", initialvalue="1")
         if itemQuantity:
+            
+            remainingitemQuantity = quantityofitem - int(itemQuantity)
+
+            cursor.execute('''
+                UPDATE inventory
+                SET quantity=? 
+                WHERE medicine_name =?
+            ''', (remainingitemQuantity, item))
+            conn.commit()
+            conn.close()
+
         # Do something with the entered string 
             # print("Entered string:", itemQuantity)
             itemPrice = int(itemQuantity) * int(priceofitem)
